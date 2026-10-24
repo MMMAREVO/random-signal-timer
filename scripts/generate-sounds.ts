@@ -29,20 +29,23 @@ interface Rest {
 }
 type Part = Tone | Rest;
 
-const beep: Tone = { kind: 'tone', ms: 150, freqs: [2500], wave: 'square' };
-const horn: Tone = { kind: 'tone', ms: 400, freqs: [350, 352.5, 700], wave: 'saw' };
+/** Short square-wave pip; each beep signal has its own pitch so they differ by ear, not only by count. */
+const pip = (freq: number): Tone => ({ kind: 'tone', ms: 70, freqs: [freq], wave: 'square' });
 const rest = (ms: number): Rest => ({ kind: 'rest', ms });
 
-/** Starting point from the plan; tune by ear and keep signals.ts durations in sync. */
+/**
+ * Pitch bands keep the signals apart: beeps are high (1.8–3.3 kHz), "tu-tu" is mid, the horn is low.
+ * Keep signals.ts durations in sync (TC-23).
+ */
 export const DESIGN: Record<SoundId, Part[]> = {
-  beep1: [beep],
-  beep2: [beep, rest(150), beep],
-  beep3: [beep, rest(150), beep, rest(150), beep],
-  horn1: [horn],
+  beep1: [{ kind: 'tone', ms: 100, freqs: [1800], wave: 'square' }],
+  beep2: [pip(2500), rest(50), pip(2500)],
+  beep3: [pip(3300), rest(50), pip(3300), rest(50), pip(3300)],
+  horn1: [{ kind: 'tone', ms: 350, freqs: [220, 221.5, 330], wave: 'saw' }],
   tutu: [
-    { kind: 'tone', ms: 300, freqs: [880], wave: 'square' },
-    rest(100),
-    { kind: 'tone', ms: 300, freqs: [587], wave: 'square' },
+    { kind: 'tone', ms: 150, freqs: [1047], wave: 'square' },
+    rest(40),
+    { kind: 'tone', ms: 150, freqs: [698], wave: 'square' },
   ],
   finish: [{ kind: 'tone', ms: 1500, freqs: [1200], wave: 'saw', altFreq: 800, altEveryMs: 125 }],
 };

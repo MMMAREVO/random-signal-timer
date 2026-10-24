@@ -184,9 +184,9 @@ describe('generateSchedule', () => {
     }
   });
 
-  it('TC-20: N = Nмакс, только самый длинный тип («3 бипа») — расписание строится, правила соблюдены', () => {
+  it('TC-20: N = Nмакс, только самый длинный тип («1 гудок») — расписание строится, правила соблюдены', () => {
     for (const durationSec of [10, 60, 300, 3600]) {
-      const base = s({ durationSec, types: ['beep3'] });
+      const base = s({ durationSec, types: ['horn1'] });
       const settings = { ...base, count: maxSignals(base) };
       for (let sd = 0; sd < 100; sd++) {
         const ev = generateSchedule(settings, mulberry32(sd));
@@ -203,9 +203,9 @@ describe('generateSchedule', () => {
   });
 
   it('TC-21: N > Nмакс напрямую в функцию — понятная ошибка, без зависания', () => {
-    const settings = s({ count: 18 });
+    const settings = s({ count: 21 });
     expect(() => generateSchedule(settings, mulberry32(1))).toThrow(ScheduleError);
-    expect(() => generateSchedule(settings, mulberry32(1))).toThrow(/максимум 17/);
+    expect(() => generateSchedule(settings, mulberry32(1))).toThrow(/максимум 20/);
     expect(() => generateSchedule(s({ count: 10_000 }), mulberry32(1))).toThrow(ScheduleError);
   });
 });

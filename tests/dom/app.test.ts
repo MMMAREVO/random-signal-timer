@@ -36,19 +36,19 @@ describe('UI', () => {
 
   it('TC-41: подсказка максимума видна под полем и пересчитывается при смене длительности и типов', () => {
     const s = screen(h, 'settings');
-    expect(hint(h)).toBe('Максимум для этих настроек: 17');
+    expect(hint(h)).toBe('Максимум для этих настроек: 20');
     fireEvent.click(getByRole(s, 'button', { name: '2 мин' }));
-    // floor((120 − 5 + 2,5) / 3,25) = 36
-    expect(hint(h)).toBe('Максимум для этих настроек: 36');
+    // floor((120 − 5 + 2,5) / 2,85) = 41
+    expect(hint(h)).toBe('Максимум для этих настроек: 41');
     fireEvent.click(getByRole(s, 'button', { name: '1 мин' }));
     for (const t of ['beep2', 'beep3', 'horn1', 'tutu'] as const) {
       fireEvent.click(getByLabelText(s, SIGNALS[t].name));
     }
-    // only «1 бип»: floor(57,5 / 2,65) = 21
-    expect(hint(h)).toBe('Максимум для этих настроек: 21');
+    // only «1 бип»: floor(57,5 / 2,6) = 22
+    expect(hint(h)).toBe('Максимум для этих настроек: 22');
     fireEvent.click(getByRole(s, 'button', { name: 'Больше на 5 секунд' }));
     expect((getByLabelText(s, 'Длительность') as HTMLInputElement).value).toBe('1:05');
-    expect(hint(h)).toBe('Максимум для этих настроек: 23');
+    expect(hint(h)).toBe('Максимум для этих настроек: 24');
     expect(h.saved.length).toBeGreaterThan(0);
     expect(h.saved.at(-1)).toMatchObject({ durationSec: 65, types: ['beep1'] });
   });
@@ -58,9 +58,9 @@ describe('UI', () => {
     expect(startBtn(h).disabled).toBe(false);
 
     const count = getByLabelText(s, 'Число сигналов') as HTMLInputElement;
-    fireEvent.input(count, { target: { value: '18' } });
+    fireEvent.input(count, { target: { value: '21' } });
     expect(startBtn(h).disabled).toBe(true);
-    expect(s.querySelector('#count-error')!.textContent).toContain('максимум 17');
+    expect(s.querySelector('#count-error')!.textContent).toContain('максимум 20');
     expect(count.getAttribute('aria-describedby')).toContain('count-error');
     fireEvent.input(count, { target: { value: '10' } });
     expect(startBtn(h).disabled).toBe(false);

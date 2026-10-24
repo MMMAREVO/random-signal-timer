@@ -52,23 +52,23 @@ describe('settings', () => {
     expect(r.errors.count).toMatch(/число сигналов/i);
   });
 
-  it('TC-06: maxSignals: 60 с, все типы, g = 2,5 с → 17', () => {
-    // floor((60 − 4 − 1 + 2,5) / (0,75 + 2,5)) = floor(57,5 / 3,25) = 17
-    expect(maxSignals(s({ durationSec: 60, gapSec: 2.5 }))).toBe(17);
+  it('TC-06: maxSignals: 60 с, все типы, g = 2,5 с → 20', () => {
+    // floor((60 − 4 − 1 + 2,5) / (0,35 + 2,5)) = floor(57,5 / 2,85) = 20
+    expect(maxSignals(s({ durationSec: 60, gapSec: 2.5 }))).toBe(20);
   });
 
-  it('TC-07: maxSignals: 60 с, только «1 бип» → 21 (максимум зависит от самого длинного типа)', () => {
-    // floor(57,5 / (0,15 + 2,5)) = 21
-    expect(maxSignals(s({ durationSec: 60, types: ['beep1'] }))).toBe(21);
-    expect(maxSignals(s({ durationSec: 60, types: ['beep1', 'beep3'] }))).toBe(17);
+  it('TC-07: maxSignals: 60 с, только «1 бип» → 22 (максимум зависит от самого длинного типа)', () => {
+    // floor(57,5 / (0,1 + 2,5)) = 22
+    expect(maxSignals(s({ durationSec: 60, types: ['beep1'] }))).toBe(22);
+    expect(maxSignals(s({ durationSec: 60, types: ['beep1', 'beep3'] }))).toBe(20);
   });
 
-  it('TC-08: N = Nмакс валидно; N = Nмакс + 1 — ошибка «максимум 17»', () => {
-    expect(validate(s({ count: 17 })).valid).toBe(true);
-    const r = validate(s({ count: 18 }));
+  it('TC-08: N = Nмакс валидно; N = Nмакс + 1 — ошибка «максимум 20»', () => {
+    expect(validate(s({ count: 20 })).valid).toBe(true);
+    const r = validate(s({ count: 21 }));
     expect(r.valid).toBe(false);
-    expect(r.errors.count).toContain('максимум 17');
-    expect(r.maxSignals).toBe(17);
+    expect(r.errors.count).toContain('максимум 20');
+    expect(r.maxSignals).toBe(20);
   });
 
   it('TC-09: при любых допустимых T, типах, g — Nмакс ≥ 1 (property)', () => {

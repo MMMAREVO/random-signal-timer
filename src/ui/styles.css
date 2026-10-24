@@ -8,6 +8,9 @@
   --accent: #ffd400;
   --accent-fg: #000;
   --danger: #ff6b6b;
+  --btn: #00c853;
+  --btn-fg: #000;
+  --btn-dark: #0b2e18;
   --c-beep1: #00e5ff;
   --c-beep2: #00e676;
   --c-beep3: #b2ff59;
@@ -66,9 +69,9 @@ output {
 button {
   min-height: var(--tap);
   min-width: var(--tap);
-  border: 2px solid var(--line);
+  border: 2px solid var(--btn);
   border-radius: var(--radius);
-  background: var(--surface-2);
+  background: var(--btn-dark);
   font-weight: 700;
   cursor: pointer;
   touch-action: manipulation;
@@ -87,21 +90,22 @@ button:disabled {
 }
 
 button[aria-pressed='true'] {
-  background: var(--fg);
-  color: var(--bg);
-  border-color: var(--fg);
+  background: var(--btn);
+  color: var(--btn-fg);
+  border-color: var(--btn);
 }
 
 .btn-primary {
-  background: var(--accent);
-  color: var(--accent-fg);
-  border-color: var(--accent);
+  background: var(--btn);
+  color: var(--btn-fg);
+  border-color: var(--btn);
   font-size: 1.3rem;
 }
 
 .btn-secondary {
   background: transparent;
-  border-color: var(--fg);
+  color: var(--btn);
+  border-color: var(--btn);
   font-size: 1.3rem;
 }
 
@@ -222,7 +226,7 @@ input[type='number']::-webkit-outer-spin-button {
   width: 30px;
   height: 30px;
   margin: 0;
-  accent-color: var(--accent);
+  accent-color: var(--btn);
   flex: none;
 }
 
