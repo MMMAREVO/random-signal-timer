@@ -16,8 +16,8 @@ export const SOUND_IDS: readonly SoundId[] = [...SIGNAL_TYPES, 'finish'];
 
 export const SIGNALS: Readonly<Record<SoundId, SignalInfo>> = {
   beep1: { code: 'beep1', name: '1 бип', file: 'beep1.wav', durationMs: 100 },
-  beep2: { code: 'beep2', name: '2 бипа', file: 'beep2.wav', durationMs: 190 },
-  beep3: { code: 'beep3', name: '3 бипа', file: 'beep3.wav', durationMs: 310 },
+  beep2: { code: 'beep2', name: '2 бипа', file: 'beep2.wav', durationMs: 290 },
+  beep3: { code: 'beep3', name: '3 бипа', file: 'beep3.wav', durationMs: 390 },
   horn1: { code: 'horn1', name: '1 гудок', file: 'horn1.wav', durationMs: 350 },
   tutu: { code: 'tutu', name: 'Ту-ту', file: 'tutu.wav', durationMs: 340 },
   finish: { code: 'finish', name: 'Финиш', file: 'finish.wav', durationMs: 1500 },

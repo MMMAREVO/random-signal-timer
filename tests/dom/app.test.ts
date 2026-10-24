@@ -36,10 +36,10 @@ describe('UI', () => {
 
   it('TC-41: подсказка максимума видна под полем и пересчитывается при смене длительности и типов', () => {
     const s = screen(h, 'settings');
-    expect(hint(h)).toBe('Максимум для этих настроек: 20');
+    expect(hint(h)).toBe('Максимум для этих настроек: 19');
     fireEvent.click(getByRole(s, 'button', { name: '2 мин' }));
-    // floor((120 − 5 + 2,5) / 2,85) = 41
-    expect(hint(h)).toBe('Максимум для этих настроек: 41');
+    // floor((120 − 5 + 2,5) / 2,89) = 40
+    expect(hint(h)).toBe('Максимум для этих настроек: 40');
     fireEvent.click(getByRole(s, 'button', { name: '1 мин' }));
     for (const t of ['beep2', 'beep3', 'horn1', 'tutu'] as const) {
       fireEvent.click(getByLabelText(s, SIGNALS[t].name));
@@ -58,9 +58,9 @@ describe('UI', () => {
     expect(startBtn(h).disabled).toBe(false);
 
     const count = getByLabelText(s, 'Число сигналов') as HTMLInputElement;
-    fireEvent.input(count, { target: { value: '21' } });
+    fireEvent.input(count, { target: { value: '20' } });
     expect(startBtn(h).disabled).toBe(true);
-    expect(s.querySelector('#count-error')!.textContent).toContain('максимум 20');
+    expect(s.querySelector('#count-error')!.textContent).toContain('максимум 19');
     expect(count.getAttribute('aria-describedby')).toContain('count-error');
     fireEvent.input(count, { target: { value: '10' } });
     expect(startBtn(h).disabled).toBe(false);

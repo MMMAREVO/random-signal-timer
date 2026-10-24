@@ -4,7 +4,7 @@
  * Run: npm run sounds
  */
 import { mkdirSync, writeFileSync } from 'node:fs';
-import { dirname, join } from 'node:path';
+import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { SIGNALS, SOUND_IDS, type SoundId } from '../src/domain/signals';
 
@@ -12,7 +12,7 @@ export const SAMPLE_RATE = 44_100;
 const PEAK_DB = -1;
 const FADE_MS = 5;
 
-type Wave = 'square' | 'saw';
+type Wave = 'square' | 'saw' | 'sine';
 interface Tone {
   kind: 'tone';
   ms: number;
@@ -22,25 +22,40 @@ interface Tone {
   /** Optional frequency alternation for the finish siren. */
   altFreq?: number;
   altEveryMs?: number;
+  /** For 'sine': extra partials as [frequency ratio, amplitude]; non-integer ratios give a bell. */
+  partials?: Array<[number, number]>;
+  /** Exponential decay time constant — a struck, percussive sound instead of a flat tone. */
+  decayMs?: number;
 }
 interface Rest {
   kind: 'rest';
   ms: number;
 }
-type Part = Tone | Rest;
+export type Part = Tone | Rest;
 
-/** Short square-wave pip; each beep signal has its own pitch so they differ by ear, not only by count. */
-const pip = (freq: number): Tone => ({ kind: 'tone', ms: 70, freqs: [freq], wave: 'square' });
-const rest = (ms: number): Rest => ({ kind: 'rest', ms });
+/** Rounded 1 kHz tone (sine + odd harmonics), as in gym interval timers. */
+const sportPip: Tone = {
+  kind: 'tone',
+  ms: 110,
+  freqs: [1000],
+  wave: 'sine',
+  partials: [
+    [3, 0.3],
+    [5, 0.1],
+  ],
+};
+/** Plain electronic 1 kHz pip. */
+const squarePip: Tone = { kind: 'tone', ms: 90, freqs: [1000], wave: 'square' };
+export const rest = (ms: number): Rest => ({ kind: 'rest', ms });
 
 /**
- * Pitch bands keep the signals apart: beeps are high (1.8–3.3 kHz), "tu-tu" is mid, the horn is low.
- * Keep signals.ts durations in sync (TC-23).
+ * Chosen by ear (scripts/preview-beeps.ts): each beep signal has its own timbre — high square,
+ * rounded tone, low square; "tu-tu" is mid, the horn is low. Keep signals.ts durations in sync (TC-23).
  */
 export const DESIGN: Record<SoundId, Part[]> = {
   beep1: [{ kind: 'tone', ms: 100, freqs: [1800], wave: 'square' }],
-  beep2: [pip(2500), rest(50), pip(2500)],
-  beep3: [pip(3300), rest(50), pip(3300), rest(50), pip(3300)],
+  beep2: [sportPip, rest(70), sportPip],
+  beep3: [squarePip, rest(60), squarePip, rest(60), squarePip],
   horn1: [{ kind: 'tone', ms: 350, freqs: [220, 221.5, 330], wave: 'saw' }],
   tutu: [
     { kind: 'tone', ms: 150, freqs: [1047], wave: 'square' },
@@ -50,9 +65,13 @@ export const DESIGN: Record<SoundId, Part[]> = {
   finish: [{ kind: 'tone', ms: 1500, freqs: [1200], wave: 'saw', altFreq: 800, altEveryMs: 125 }],
 };
 
-function osc(wave: Wave, phase: number): number {
+function osc(t: Tone, phase: number): number {
   const p = phase - Math.floor(phase);
-  return wave === 'square' ? (p < 0.5 ? 1 : -1) : 2 * p - 1;
+  if (t.wave === 'square') return p < 0.5 ? 1 : -1;
+  if (t.wave === 'saw') return 2 * p - 1;
+  let v = Math.sin(2 * Math.PI * phase);
+  for (const [ratio, amp] of t.partials ?? []) v += amp * Math.sin(2 * Math.PI * phase * ratio);
+  return v;
 }
 
 function renderTone(t: Tone): Float32Array {
@@ -68,16 +87,21 @@ function renderTone(t: Tone): Float32Array {
     t.freqs.forEach((f, k) => {
       const freq = useAlt ? (t.altFreq as number) * (f / (t.freqs[0] as number)) : f;
       phases[k] = (phases[k] as number) + freq / SAMPLE_RATE;
-      v += osc(t.wave, phases[k] as number);
+      v += osc(t, phases[k] as number);
     });
-    const env = Math.min(1, i / fade, (n - 1 - i) / fade);
+    const decay = t.decayMs ? Math.exp(-ms / t.decayMs) : 1;
+    const env = Math.min(1, i / fade, (n - 1 - i) / fade) * decay;
     out[i] = (v / t.freqs.length) * Math.max(0, env);
   }
   return out;
 }
 
 export function renderSound(id: SoundId): Float32Array {
-  const chunks = DESIGN[id].map((p) =>
+  return renderParts(DESIGN[id]);
+}
+
+export function renderParts(parts: Part[]): Float32Array {
+  const chunks = parts.map((p) =>
     p.kind === 'tone' ? renderTone(p) : new Float32Array(Math.round((p.ms / 1000) * SAMPLE_RATE)),
   );
   const total = chunks.reduce((a, c) => a + c.length, 0);
@@ -117,10 +141,13 @@ export function encodeWav(samples: Float32Array): Buffer {
   return buf;
 }
 
-const outDir = join(dirname(fileURLToPath(import.meta.url)), '..', 'public', 'sounds');
-mkdirSync(outDir, { recursive: true });
-for (const id of SOUND_IDS) {
-  const wav = encodeWav(renderSound(id));
-  writeFileSync(join(outDir, SIGNALS[id].file), wav);
-  console.log(`${SIGNALS[id].file}: ${(wav.length / 1024).toFixed(1)} KB`);
+const isMain = process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url);
+if (isMain) {
+  const outDir = join(dirname(fileURLToPath(import.meta.url)), '..', 'public', 'sounds');
+  mkdirSync(outDir, { recursive: true });
+  for (const id of SOUND_IDS) {
+    const wav = encodeWav(renderSound(id));
+    writeFileSync(join(outDir, SIGNALS[id].file), wav);
+    console.log(`${SIGNALS[id].file}: ${(wav.length / 1024).toFixed(1)} KB`);
+  }
 }
