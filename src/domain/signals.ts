@@ -1,4 +1,4 @@
-export type SignalType = 'whistle1' | 'whistle2' | 'horn1' | 'quack' | 'tutu';
+export type SignalType = 'whistle1' | 'whistle2' | 'horn1' | 'quack' | 'scream';
 export type SoundId = SignalType | 'finish';
 
 export interface SignalInfo {
@@ -15,7 +15,7 @@ export const SIGNAL_TYPES: readonly SignalType[] = [
   'whistle2',
   'horn1',
   'quack',
-  'tutu',
+  'scream',
 ];
 
 export const SOUND_IDS: readonly SoundId[] = [...SIGNAL_TYPES, 'finish'];
@@ -24,8 +24,8 @@ export const SIGNALS: Readonly<Record<SoundId, SignalInfo>> = {
   whistle1: { code: 'whistle1', name: '1 свисток', file: 'whistle1.wav', durationMs: 280 },
   whistle2: { code: 'whistle2', name: '2 свистка', file: 'whistle2.wav', durationMs: 370 },
   horn1: { code: 'horn1', name: 'Гудок', file: 'horn1.wav', durationMs: 350 },
-  quack: { code: 'quack', name: 'Кря', file: 'quack.wav', durationMs: 220 },
-  tutu: { code: 'tutu', name: 'Ту-ту', file: 'tutu.wav', durationMs: 340 },
+  quack: { code: 'quack', name: 'Кря', file: 'quack.wav', durationMs: 200 },
+  scream: { code: 'scream', name: 'Крик', file: 'scream.wav', durationMs: 450 },
   finish: { code: 'finish', name: 'Финиш', file: 'finish.wav', durationMs: 1500 },
 };
 

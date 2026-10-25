@@ -39,7 +39,7 @@ test.describe('сквозные сценарии', () => {
   }) => {
     await page.getByRole('button', { name: '1 мин' }).click();
     await page.getByRole('checkbox', { name: 'Кря', exact: true }).uncheck();
-    await page.getByRole('checkbox', { name: 'Ту-ту', exact: true }).uncheck();
+    await page.getByRole('checkbox', { name: 'Крик', exact: true }).uncheck();
     await page.getByLabel('Число сигналов').fill('10');
     await page.getByRole('button', { name: 'Старт' }).click();
     await expect(page.locator('.countdown-number')).toHaveText('5');
@@ -103,11 +103,11 @@ test.describe('сквозные сценарии', () => {
 
   test('TC-51: перезагрузка страницы — настройки сохранились', async ({ page }) => {
     await page.getByRole('button', { name: '2 мин' }).click();
-    await page.getByRole('checkbox', { name: 'Ту-ту', exact: true }).uncheck();
+    await page.getByRole('checkbox', { name: 'Крик', exact: true }).uncheck();
     await page.getByLabel('Число сигналов').fill('7');
     await page.reload();
     await expect(page.getByLabel('Длительность')).toHaveValue('2:00');
-    await expect(page.getByRole('checkbox', { name: 'Ту-ту', exact: true })).not.toBeChecked();
+    await expect(page.getByRole('checkbox', { name: 'Крик', exact: true })).not.toBeChecked();
     await expect(page.getByRole('checkbox', { name: '1 свисток', exact: true })).toBeChecked();
     await expect(page.getByLabel('Число сигналов')).toHaveValue('7');
   });

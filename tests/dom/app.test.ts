@@ -36,19 +36,19 @@ describe('UI', () => {
 
   it('TC-41: подсказка максимума видна под полем и пересчитывается при смене длительности и типов', () => {
     const s = screen(h, 'settings');
-    expect(hint(h)).toBe('Максимум для этих настроек: 20');
+    expect(hint(h)).toBe('Максимум для этих настроек: 19');
     fireEvent.click(getByRole(s, 'button', { name: '2 мин' }));
-    // floor((120 − 5 + 2,5) / 2,87) = 40
-    expect(hint(h)).toBe('Максимум для этих настроек: 40');
+    // floor((120 − 5 + 2,5) / 2,95) = 39
+    expect(hint(h)).toBe('Максимум для этих настроек: 39');
     fireEvent.click(getByRole(s, 'button', { name: '1 мин' }));
-    for (const t of ['whistle1', 'whistle2', 'horn1', 'tutu'] as const) {
+    for (const t of ['whistle1', 'whistle2', 'horn1', 'scream'] as const) {
       fireEvent.click(getByLabelText(s, SIGNALS[t].name));
     }
-    // only «Кря»: floor(57,5 / 2,72) = 21
+    // only «Кря»: floor(57,5 / 2,7) = 21
     expect(hint(h)).toBe('Максимум для этих настроек: 21');
     fireEvent.click(getByRole(s, 'button', { name: 'Больше на 5 секунд' }));
     expect((getByLabelText(s, 'Длительность') as HTMLInputElement).value).toBe('1:05');
-    expect(hint(h)).toBe('Максимум для этих настроек: 22');
+    expect(hint(h)).toBe('Максимум для этих настроек: 23');
     expect(h.saved.length).toBeGreaterThan(0);
     expect(h.saved.at(-1)).toMatchObject({ durationSec: 65, types: ['quack'] });
   });
@@ -58,9 +58,9 @@ describe('UI', () => {
     expect(startBtn(h).disabled).toBe(false);
 
     const count = getByLabelText(s, 'Число сигналов') as HTMLInputElement;
-    fireEvent.input(count, { target: { value: '21' } });
+    fireEvent.input(count, { target: { value: '20' } });
     expect(startBtn(h).disabled).toBe(true);
-    expect(s.querySelector('#count-error')!.textContent).toContain('максимум 20');
+    expect(s.querySelector('#count-error')!.textContent).toContain('максимум 19');
     expect(count.getAttribute('aria-describedby')).toContain('count-error');
     fireEvent.input(count, { target: { value: '10' } });
     expect(startBtn(h).disabled).toBe(false);
@@ -84,11 +84,11 @@ describe('UI', () => {
 
   it('TC-43: кнопка «прослушать» играет именно свой сигнал', () => {
     const s = screen(h, 'settings');
-    for (const t of ['whistle1', 'whistle2', 'horn1', 'quack', 'tutu'] as const) {
+    for (const t of ['whistle1', 'whistle2', 'horn1', 'quack', 'scream'] as const) {
       fireEvent.click(getByRole(s, 'button', { name: `Прослушать «${SIGNALS[t].name}»` }));
       expect(h.played.at(-1)).toBe(t);
     }
-    expect(h.played).toEqual(['whistle1', 'whistle2', 'horn1', 'quack', 'tutu']);
+    expect(h.played).toEqual(['whistle1', 'whistle2', 'horn1', 'quack', 'scream']);
   });
 
   it('TC-44: на экране «Идёт» время следующего сигнала нигде не показано', () => {

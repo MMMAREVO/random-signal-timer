@@ -32,8 +32,10 @@ interface Tone {
   trill?: { hz: number; pitch: number; depth: number };
   /** Breath noise mixed in, as a share of the tone. */
   noise?: number;
-  /** Resonant band-pass (nasal formant) mixed over the dry tone. */
-  formant?: { hz: number; q: number; mix: number };
+  /** Resonant band-passes (formants: nasal "quack", vowel "a") as [Hz, Q, gain], mixed over the dry tone. */
+  formants?: { peaks: Array<[number, number, number]>; mix: number };
+  /** Saturation (tanh) amount after mixing — harsher, more distorted sound. */
+  drive?: number;
 }
 interface Rest {
   kind: 'rest';
@@ -54,8 +56,8 @@ const whistle = (ms: number): Tone => ({
 export const rest = (ms: number): Rest => ({ kind: 'rest', ms });
 
 /**
- * Each signal has its own timbre: high trilled whistle, low horn, nasal falling quack,
- * mid two-note "tu-tu". Keep signals.ts durations in sync (TC-23).
+ * Each signal has its own timbre: high trilled whistle, distorted low horn, bright nasal falling
+ * quack, raspy "a-a-a" scream. Keep signals.ts durations in sync (TC-23).
  */
 export const DESIGN: Record<SoundId, Part[]> = {
   whistle1: [whistle(280)],
@@ -63,19 +65,41 @@ export const DESIGN: Record<SoundId, Part[]> = {
   quack: [
     {
       kind: 'tone',
-      ms: 220,
-      freqs: [430, 434],
-      wave: 'saw',
-      glide: 0.72,
-      decayMs: 260,
-      formant: { hz: 1300, q: 4, mix: 0.8 },
+      ms: 200,
+      freqs: [560, 563],
+      wave: 'square',
+      glide: 0.7,
+      decayMs: 500,
+      formants: {
+        peaks: [
+          [1500, 5, 1],
+          [2800, 6, 0.7],
+        ],
+        mix: 0.85,
+      },
+      drive: 2.5,
     },
   ],
-  horn1: [{ kind: 'tone', ms: 350, freqs: [220, 221.5, 330], wave: 'saw' }],
-  tutu: [
-    { kind: 'tone', ms: 150, freqs: [1047], wave: 'square' },
-    rest(40),
-    { kind: 'tone', ms: 150, freqs: [698], wave: 'square' },
+  horn1: [{ kind: 'tone', ms: 350, freqs: [196, 198.5, 294, 392.7], wave: 'square', drive: 6 }],
+  scream: [
+    {
+      kind: 'tone',
+      ms: 450,
+      freqs: [440, 443],
+      wave: 'saw',
+      glide: 0.85,
+      trill: { hz: 7, pitch: 0.04, depth: 0.1 },
+      noise: 0.25,
+      formants: {
+        peaks: [
+          [900, 6, 1],
+          [1350, 7, 0.8],
+          [2700, 8, 0.5],
+        ],
+        mix: 0.9,
+      },
+      drive: 3,
+    },
   ],
   finish: [{ kind: 'tone', ms: 1500, freqs: [1200], wave: 'saw', altFreq: 800, altEveryMs: 125 }],
 };
@@ -138,10 +162,18 @@ function renderTone(t: Tone): Float32Array {
     const env = Math.min(1, i / fade, (n - 1 - i) / fade) * decay * am;
     out[i] = v * Math.max(0, env);
   }
-  if (!t.formant) return out;
-  const { hz, q, mix } = t.formant;
-  const wet = bandPass(out, hz, q);
-  return out.map((v, i) => (1 - mix) * v + mix * 3 * (wet[i] as number));
+  const shaped = t.formants ? applyFormants(out, t.formants) : out;
+  if (!t.drive) return shaped;
+  const d = t.drive;
+  return shaped.map((v) => Math.tanh(d * v) / Math.tanh(d));
+}
+
+function applyFormants(dry: Float32Array, f: NonNullable<Tone['formants']>): Float32Array {
+  const wet = new Float32Array(dry.length);
+  for (const [hz, q, gain] of f.peaks) {
+    bandPass(dry, hz, q).forEach((v, i) => (wet[i] = (wet[i] as number) + gain * v));
+  }
+  return dry.map((v, i) => (1 - f.mix) * v + f.mix * 3 * (wet[i] as number));
 }
 
 export function renderSound(id: SoundId): Float32Array {

@@ -15,7 +15,7 @@
   --c-whistle2: #00e676;
   --c-quack: #b2ff59;
   --c-horn1: #ff9100;
-  --c-tutu: #ff4fa3;
+  --c-scream: #ff4fa3;
   --radius: 14px;
   --tap: 56px;
   color-scheme: dark;
@@ -250,8 +250,8 @@ input[type='number']::-webkit-outer-spin-button {
 .signal-row[data-type='horn1'] {
   --sw: var(--c-horn1);
 }
-.signal-row[data-type='tutu'] {
-  --sw: var(--c-tutu);
+.signal-row[data-type='scream'] {
+  --sw: var(--c-scream);
 }
 
 .listen {
@@ -446,8 +446,8 @@ input[type='number']::-webkit-outer-spin-button {
 .flash[data-type='horn1'] {
   --flash: var(--c-horn1);
 }
-.flash[data-type='tutu'] {
-  --flash: var(--c-tutu);
+.flash[data-type='scream'] {
+  --flash: var(--c-scream);
 }
 
 @keyframes flash-in {
@@ -497,8 +497,8 @@ input[type='number']::-webkit-outer-spin-button {
 .log li[data-type='horn1'] {
   --sw: var(--c-horn1);
 }
-.log li[data-type='tutu'] {
-  --sw: var(--c-tutu);
+.log li[data-type='scream'] {
+  --sw: var(--c-scream);
 }
 
 /* ---------- audio banner ---------- */
