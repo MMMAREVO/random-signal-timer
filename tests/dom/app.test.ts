@@ -41,16 +41,16 @@ describe('UI', () => {
     // floor((120 − 5 + 2,5) / 3,3) = 35
     expect(hint(h)).toBe('Максимум для этих настроек: 35');
     fireEvent.click(getByRole(s, 'button', { name: '1 мин' }));
-    for (const t of ['whistle1', 'whistle2', 'whistleLong', 'bibeep'] as const) {
+    for (const t of ['whistle2', 'whistleLong', 'bibeep', 'train'] as const) {
       fireEvent.click(getByLabelText(s, SIGNALS[t].name));
     }
-    // only «Кря»: floor(57,5 / 2,7) = 21
+    // only «Короткий свисток»: floor(57,5 / 2,7) = 21
     expect(hint(h)).toBe('Максимум для этих настроек: 21');
     fireEvent.click(getByRole(s, 'button', { name: 'Больше на 5 секунд' }));
     expect((getByLabelText(s, 'Длительность') as HTMLInputElement).value).toBe('1:05');
     expect(hint(h)).toBe('Максимум для этих настроек: 23');
     expect(h.saved.length).toBeGreaterThan(0);
-    expect(h.saved.at(-1)).toMatchObject({ durationSec: 65, types: ['quack'] });
+    expect(h.saved.at(-1)).toMatchObject({ durationSec: 65, types: ['whistle1'] });
   });
 
   it('TC-42: неверные настройки — «Старт» неактивен, текст ошибки рядом с полем', () => {
@@ -84,11 +84,11 @@ describe('UI', () => {
 
   it('TC-43: кнопка «прослушать» играет именно свой сигнал', () => {
     const s = screen(h, 'settings');
-    for (const t of ['whistle1', 'whistle2', 'whistleLong', 'bibeep', 'quack'] as const) {
+    for (const t of ['whistle1', 'whistle2', 'whistleLong', 'bibeep', 'train'] as const) {
       fireEvent.click(getByRole(s, 'button', { name: `Прослушать «${SIGNALS[t].name}»` }));
       expect(h.played.at(-1)).toBe(t);
     }
-    expect(h.played).toEqual(['whistle1', 'whistle2', 'whistleLong', 'bibeep', 'quack']);
+    expect(h.played).toEqual(['whistle1', 'whistle2', 'whistleLong', 'bibeep', 'train']);
   });
 
   it('TC-44: на экране «Идёт» время следующего сигнала нигде не показано', () => {

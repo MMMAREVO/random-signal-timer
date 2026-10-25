@@ -38,7 +38,7 @@ test.describe('сквозные сценарии', () => {
     page,
   }) => {
     await page.getByRole('button', { name: '1 мин' }).click();
-    await page.getByRole('checkbox', { name: 'Кря', exact: true }).uncheck();
+    await page.getByRole('checkbox', { name: 'Ту-ту', exact: true }).uncheck();
     await page.getByRole('checkbox', { name: 'Длинный свисток', exact: true }).uncheck();
     await page.getByLabel('Число сигналов').fill('10');
     await page.getByRole('button', { name: 'Старт' }).click();

@@ -13,7 +13,7 @@
   --btn-dark: #0b2e18;
   --c-whistle1: #00e5ff;
   --c-whistle2: #00e676;
-  --c-quack: #b2ff59;
+  --c-train: #b2ff59;
   --c-bibeep: #ff9100;
   --c-whistleLong: #ff4fa3;
   --radius: 14px;
@@ -244,8 +244,8 @@ input[type='number']::-webkit-outer-spin-button {
 .signal-row[data-type='whistle2'] {
   --sw: var(--c-whistle2);
 }
-.signal-row[data-type='quack'] {
-  --sw: var(--c-quack);
+.signal-row[data-type='train'] {
+  --sw: var(--c-train);
 }
 .signal-row[data-type='bibeep'] {
   --sw: var(--c-bibeep);
@@ -440,8 +440,8 @@ input[type='number']::-webkit-outer-spin-button {
 .flash[data-type='whistle2'] {
   --flash: var(--c-whistle2);
 }
-.flash[data-type='quack'] {
-  --flash: var(--c-quack);
+.flash[data-type='train'] {
+  --flash: var(--c-train);
 }
 .flash[data-type='bibeep'] {
   --flash: var(--c-bibeep);
@@ -491,8 +491,8 @@ input[type='number']::-webkit-outer-spin-button {
 .log li[data-type='whistle2'] {
   --sw: var(--c-whistle2);
 }
-.log li[data-type='quack'] {
-  --sw: var(--c-quack);
+.log li[data-type='train'] {
+  --sw: var(--c-train);
 }
 .log li[data-type='bibeep'] {
   --sw: var(--c-bibeep);

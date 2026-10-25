@@ -26,13 +26,13 @@ interface Tone {
   partials?: Array<[number, number]>;
   /** Exponential decay time constant — a struck, percussive sound instead of a flat tone. */
   decayMs?: number;
-  /** Pitch at the end relative to the start (linear glide), e.g. 0.75 for a falling "quack". */
+  /** Pitch at the end relative to the start (linear glide), e.g. 0.7 for a falling tone. */
   glide?: number;
   /** Pitch and loudness wobble — the rattling pea of a referee whistle. */
   trill?: { hz: number; pitch: number; depth: number };
   /** Breath noise mixed in, as a share of the tone. */
   noise?: number;
-  /** Resonant band-passes (formants: nasal "quack", vowel "a") as [Hz, Q, gain], mixed over the dry tone. */
+  /** Resonant band-passes (formants) as [Hz, Q, gain], mixed over the dry tone. */
   formants?: { peaks: Array<[number, number, number]>; mix: number };
   /** Saturation (tanh) amount after mixing — harsher, more distorted sound. */
   drive?: number;
@@ -55,6 +55,22 @@ const whistle = (ms: number): Tone => ({
 });
 export const rest = (ms: number): Rest => ({ kind: 'rest', ms });
 
+/** Steam locomotive chime whistle: three-note chord with breathy steam. */
+const toot = (ms: number): Tone => ({
+  kind: 'tone',
+  ms,
+  freqs: [440, 523, 659],
+  wave: 'sine',
+  partials: [
+    [2, 0.35],
+    [3, 0.15],
+  ],
+  glide: 0.98,
+  trill: { hz: 5, pitch: 0.004, depth: 0.08 },
+  noise: 0.12,
+  drive: 1.5,
+});
+
 /** Harsh electronic chirp: two clashing square tones, overdriven. */
 const harsh = (ms: number): Tone => ({
   kind: 'tone',
@@ -66,35 +82,14 @@ const harsh = (ms: number): Tone => ({
 
 /**
  * Three whistles differ by length and count; "bi-beep" is a harsh electronic double chirp;
- * the quack imitates a mallard. Keep signals.ts durations in sync (TC-23).
+ * "tu-tu" is a steam locomotive whistle. Keep signals.ts durations in sync (TC-23).
  */
 export const DESIGN: Record<SoundId, Part[]> = {
   whistle1: [whistle(200)],
   whistle2: [whistle(150), rest(70), whistle(150)],
   whistleLong: [whistle(800)],
   bibeep: [harsh(90), rest(50), harsh(130)],
-  // Duck quack: high nasal buzz with a raspy flutter, falling pitch, fast attack.
-  quack: [
-    {
-      kind: 'tone',
-      ms: 200,
-      freqs: [660, 666],
-      wave: 'saw',
-      glide: 0.8,
-      trill: { hz: 80, pitch: 0.02, depth: 0.5 },
-      noise: 0.15,
-      decayMs: 260,
-      formants: {
-        peaks: [
-          [1900, 4, 1],
-          [3600, 5, 0.8],
-          [5200, 6, 0.3],
-        ],
-        mix: 0.95,
-      },
-      drive: 2,
-    },
-  ],
+  train: [toot(220), rest(80), toot(380)],
   finish: [{ kind: 'tone', ms: 1500, freqs: [1200], wave: 'saw', altFreq: 800, altEveryMs: 125 }],
 };
 

@@ -1,4 +1,4 @@
-export type SignalType = 'whistle1' | 'whistle2' | 'whistleLong' | 'bibeep' | 'quack';
+export type SignalType = 'whistle1' | 'whistle2' | 'whistleLong' | 'bibeep' | 'train';
 export type SoundId = SignalType | 'finish';
 
 export interface SignalInfo {
@@ -15,7 +15,7 @@ export const SIGNAL_TYPES: readonly SignalType[] = [
   'whistle2',
   'whistleLong',
   'bibeep',
-  'quack',
+  'train',
 ];
 
 export const SOUND_IDS: readonly SoundId[] = [...SIGNAL_TYPES, 'finish'];
@@ -30,7 +30,7 @@ export const SIGNALS: Readonly<Record<SoundId, SignalInfo>> = {
     durationMs: 800,
   },
   bibeep: { code: 'bibeep', name: 'Би-бип', file: 'bibeep.wav', durationMs: 270 },
-  quack: { code: 'quack', name: 'Кря', file: 'quack.wav', durationMs: 200 },
+  train: { code: 'train', name: 'Ту-ту', file: 'train.wav', durationMs: 680 },
   finish: { code: 'finish', name: 'Финиш', file: 'finish.wav', durationMs: 1500 },
 };
 

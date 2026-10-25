@@ -57,10 +57,10 @@ describe('settings', () => {
     expect(maxSignals(s({ durationSec: 60, gapSec: 2.5 }))).toBe(17);
   });
 
-  it('TC-07: maxSignals: 60 с, только «Кря» → 21 (максимум зависит от самого длинного типа)', () => {
+  it('TC-07: maxSignals: 60 с, только «Короткий свисток» → 21 (максимум зависит от самого длинного типа)', () => {
     // floor(57,5 / (0,2 + 2,5)) = 21
-    expect(maxSignals(s({ durationSec: 60, types: ['quack'] }))).toBe(21);
-    expect(maxSignals(s({ durationSec: 60, types: ['quack', 'whistle2'] }))).toBe(20);
+    expect(maxSignals(s({ durationSec: 60, types: ['whistle1'] }))).toBe(21);
+    expect(maxSignals(s({ durationSec: 60, types: ['whistle1', 'whistle2'] }))).toBe(20);
   });
 
   it('TC-08: N = Nмакс валидно; N = Nмакс + 1 — ошибка «максимум 17»', () => {
