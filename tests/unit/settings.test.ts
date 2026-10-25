@@ -53,7 +53,7 @@ describe('settings', () => {
   });
 
   it('TC-06: maxSignals: 60 с, все типы, g = 2,5 с → 17', () => {
-    // floor((60 − 4 − 1 + 2,5) / (0,8 + 2,5)) = floor(57,5 / 3,3) = 17
+    // floor((60 − 4 − 1 + 2,5) / (0,83 + 2,5)) = floor(57,5 / 3,33) = 17
     expect(maxSignals(s({ durationSec: 60, gapSec: 2.5 }))).toBe(17);
   });
 

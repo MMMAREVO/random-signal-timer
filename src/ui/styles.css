@@ -14,8 +14,8 @@
   --c-whistle1: #00e5ff;
   --c-whistle2: #00e676;
   --c-train: #b2ff59;
-  --c-bibeep: #ff9100;
-  --c-whistleLong: #ff4fa3;
+  --c-beep: #ff9100;
+  --c-shortLong: #ff4fa3;
   --radius: 14px;
   --tap: 56px;
   color-scheme: dark;
@@ -247,11 +247,11 @@ input[type='number']::-webkit-outer-spin-button {
 .signal-row[data-type='train'] {
   --sw: var(--c-train);
 }
-.signal-row[data-type='bibeep'] {
-  --sw: var(--c-bibeep);
+.signal-row[data-type='beep'] {
+  --sw: var(--c-beep);
 }
-.signal-row[data-type='whistleLong'] {
-  --sw: var(--c-whistleLong);
+.signal-row[data-type='shortLong'] {
+  --sw: var(--c-shortLong);
 }
 
 .listen {
@@ -443,11 +443,11 @@ input[type='number']::-webkit-outer-spin-button {
 .flash[data-type='train'] {
   --flash: var(--c-train);
 }
-.flash[data-type='bibeep'] {
-  --flash: var(--c-bibeep);
+.flash[data-type='beep'] {
+  --flash: var(--c-beep);
 }
-.flash[data-type='whistleLong'] {
-  --flash: var(--c-whistleLong);
+.flash[data-type='shortLong'] {
+  --flash: var(--c-shortLong);
 }
 
 @keyframes flash-in {
@@ -494,11 +494,11 @@ input[type='number']::-webkit-outer-spin-button {
 .log li[data-type='train'] {
   --sw: var(--c-train);
 }
-.log li[data-type='bibeep'] {
-  --sw: var(--c-bibeep);
+.log li[data-type='beep'] {
+  --sw: var(--c-beep);
 }
-.log li[data-type='whistleLong'] {
-  --sw: var(--c-whistleLong);
+.log li[data-type='shortLong'] {
+  --sw: var(--c-shortLong);
 }
 
 /* ---------- audio banner ---------- */

@@ -1,4 +1,4 @@
-export type SignalType = 'whistle1' | 'whistle2' | 'whistleLong' | 'bibeep' | 'train';
+export type SignalType = 'whistle1' | 'whistle2' | 'shortLong' | 'beep' | 'train';
 export type SoundId = SignalType | 'finish';
 
 export interface SignalInfo {
@@ -13,8 +13,8 @@ export interface SignalInfo {
 export const SIGNAL_TYPES: readonly SignalType[] = [
   'whistle1',
   'whistle2',
-  'whistleLong',
-  'bibeep',
+  'shortLong',
+  'beep',
   'train',
 ];
 
@@ -23,14 +23,14 @@ export const SOUND_IDS: readonly SoundId[] = [...SIGNAL_TYPES, 'finish'];
 export const SIGNALS: Readonly<Record<SoundId, SignalInfo>> = {
   whistle1: { code: 'whistle1', name: 'Короткий свисток', file: 'whistle1.wav', durationMs: 200 },
   whistle2: { code: 'whistle2', name: '2 свистка', file: 'whistle2.wav', durationMs: 370 },
-  whistleLong: {
-    code: 'whistleLong',
-    name: 'Длинный свисток',
-    file: 'whistleLong.wav',
-    durationMs: 800,
+  shortLong: {
+    code: 'shortLong',
+    name: 'Короткий-длинный',
+    file: 'shortLong.wav',
+    durationMs: 830,
   },
-  bibeep: { code: 'bibeep', name: 'Би-бип', file: 'bibeep.wav', durationMs: 270 },
-  train: { code: 'train', name: 'Ту-ту', file: 'train.wav', durationMs: 680 },
+  beep: { code: 'beep', name: 'Бип', file: 'beep.wav', durationMs: 150 },
+  train: { code: 'train', name: 'Ту', file: 'train.wav', durationMs: 450 },
   finish: { code: 'finish', name: 'Финиш', file: 'finish.wav', durationMs: 1500 },
 };
 
