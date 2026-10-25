@@ -41,7 +41,7 @@ describe('UI', () => {
     // floor((120 − 5 + 2,5) / 3,33) = 35
     expect(hint(h)).toBe('Максимум для этих настроек: 35');
     fireEvent.click(getByRole(s, 'button', { name: '1 мин' }));
-    for (const t of ['whistle2', 'shortLong', 'beep', 'train'] as const) {
+    for (const t of ['whistle2', 'shortLong', 'tutu', 'train'] as const) {
       fireEvent.click(getByLabelText(s, SIGNALS[t].name));
     }
     // only «Короткий свисток»: floor(57,5 / 2,7) = 21
@@ -84,11 +84,11 @@ describe('UI', () => {
 
   it('TC-43: кнопка «прослушать» играет именно свой сигнал', () => {
     const s = screen(h, 'settings');
-    for (const t of ['whistle1', 'whistle2', 'shortLong', 'beep', 'train'] as const) {
+    for (const t of ['whistle1', 'whistle2', 'shortLong', 'tutu', 'train'] as const) {
       fireEvent.click(getByRole(s, 'button', { name: `Прослушать «${SIGNALS[t].name}»` }));
       expect(h.played.at(-1)).toBe(t);
     }
-    expect(h.played).toEqual(['whistle1', 'whistle2', 'shortLong', 'beep', 'train']);
+    expect(h.played).toEqual(['whistle1', 'whistle2', 'shortLong', 'tutu', 'train']);
   });
 
   it('TC-44: на экране «Идёт» время следующего сигнала нигде не показано', () => {

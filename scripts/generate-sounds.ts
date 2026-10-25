@@ -71,24 +71,15 @@ const toot = (ms: number): Tone => ({
   drive: 1.5,
 });
 
-/** Harsh electronic chirp: two clashing square tones, overdriven. */
-const harsh = (ms: number): Tone => ({
-  kind: 'tone',
-  ms,
-  freqs: [1250, 1330],
-  wave: 'square',
-  drive: 5,
-});
-
 /**
- * Three whistles differ by length and count; "beep" is a harsh electronic chirp;
+ * Three whistles differ by length and count; "tutu" is a harsh electronic chirp;
  * "tu" is a steam locomotive whistle. Keep signals.ts durations in sync (TC-23).
  */
 export const DESIGN: Record<SoundId, Part[]> = {
   whistle1: [whistle(200)],
   whistle2: [whistle(150), rest(70), whistle(150)],
   shortLong: [whistle(150), rest(80), whistle(600)],
-  beep: [harsh(150)],
+  tutu: [toot(220), rest(80), toot(380)],
   train: [toot(450)],
   finish: [{ kind: 'tone', ms: 1500, freqs: [1200], wave: 'saw', altFreq: 800, altEveryMs: 125 }],
 };

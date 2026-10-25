@@ -49,13 +49,13 @@ test.describe('сквозные сценарии', () => {
     const p = await played(page);
     const sigs = signalsOnly(p);
     expect(sigs).toHaveLength(10);
-    for (const s of sigs) expect(['whistle1.wav', 'whistle2.wav', 'beep.wav']).toContain(s.file);
+    for (const s of sigs) expect(['whistle1.wav', 'whistle2.wav', 'tutu.wav']).toContain(s.file);
     expect(new Set(sigs.map((s) => s.file)).size).toBe(3);
     expect(p.filter((x) => x.file === 'finish.wav')).toHaveLength(1);
     expect(p.at(-1)!.file).toBe('finish.wav');
     await expect(page.getByRole('listitem')).toHaveCount(10);
     await expect(page.getByRole('listitem').first()).toHaveText(
-      /^\d\d:\d\d — (Короткий свисток|2 свистка|Бип)$/,
+      /^\d\d:\d\d — (Короткий свисток|2 свистка|Ту-ту)$/,
     );
   });
 
@@ -103,11 +103,11 @@ test.describe('сквозные сценарии', () => {
 
   test('TC-51: перезагрузка страницы — настройки сохранились', async ({ page }) => {
     await page.getByRole('button', { name: '2 мин' }).click();
-    await page.getByRole('checkbox', { name: 'Бип', exact: true }).uncheck();
+    await page.getByRole('checkbox', { name: 'Ту-ту', exact: true }).uncheck();
     await page.getByLabel('Число сигналов').fill('7');
     await page.reload();
     await expect(page.getByLabel('Длительность')).toHaveValue('2:00');
-    await expect(page.getByRole('checkbox', { name: 'Бип', exact: true })).not.toBeChecked();
+    await expect(page.getByRole('checkbox', { name: 'Ту-ту', exact: true })).not.toBeChecked();
     await expect(
       page.getByRole('checkbox', { name: 'Короткий свисток', exact: true }),
     ).toBeChecked();

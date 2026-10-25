@@ -166,7 +166,7 @@ describe('generateSchedule', () => {
   });
 
   it('TC-19: равномерность типов (10 000 сигналов, 3 типа) — доля каждого 33 % ± 3 %', () => {
-    const types: SignalType[] = ['whistle1', 'whistle2', 'beep'];
+    const types: SignalType[] = ['whistle1', 'whistle2', 'tutu'];
     const settings = s({ durationSec: 60, types, count: 10 });
     const counts = new Map<SignalType, number>();
     let total = 0;
