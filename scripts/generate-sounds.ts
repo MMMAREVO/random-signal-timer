@@ -66,29 +66,33 @@ const harsh = (ms: number): Tone => ({
 
 /**
  * Three whistles differ by length and count; "bi-beep" is a harsh electronic double chirp;
- * the quack is bright, nasal and falling. Keep signals.ts durations in sync (TC-23).
+ * the quack imitates a mallard. Keep signals.ts durations in sync (TC-23).
  */
 export const DESIGN: Record<SoundId, Part[]> = {
   whistle1: [whistle(200)],
   whistle2: [whistle(150), rest(70), whistle(150)],
   whistleLong: [whistle(800)],
   bibeep: [harsh(90), rest(50), harsh(130)],
+  // Mallard quack: low nasal buzz with a raspy flutter, falling pitch, fast attack.
   quack: [
     {
       kind: 'tone',
       ms: 200,
-      freqs: [560, 563],
-      wave: 'square',
-      glide: 0.7,
-      decayMs: 500,
+      freqs: [310, 313],
+      wave: 'saw',
+      glide: 0.8,
+      trill: { hz: 55, pitch: 0.02, depth: 0.5 },
+      noise: 0.15,
+      decayMs: 260,
       formants: {
         peaks: [
-          [1500, 5, 1],
-          [2800, 6, 0.7],
+          [1100, 4, 1],
+          [2500, 5, 0.8],
+          [3500, 6, 0.3],
         ],
-        mix: 0.85,
+        mix: 0.95,
       },
-      drive: 2.5,
+      drive: 2,
     },
   ],
   finish: [{ kind: 'tone', ms: 1500, freqs: [1200], wave: 'saw', altFreq: 800, altEveryMs: 125 }],
