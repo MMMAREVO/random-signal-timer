@@ -203,9 +203,9 @@ describe('generateSchedule', () => {
   });
 
   it('TC-21: N > Nмакс напрямую в функцию — понятная ошибка, без зависания', () => {
-    const settings = s({ count: 18 });
+    const settings = s({ count: 19 });
     expect(() => generateSchedule(settings, mulberry32(1))).toThrow(ScheduleError);
-    expect(() => generateSchedule(settings, mulberry32(1))).toThrow(/максимум 17/);
+    expect(() => generateSchedule(settings, mulberry32(1))).toThrow(/максимум 18/);
     expect(() => generateSchedule(s({ count: 10_000 }), mulberry32(1))).toThrow(ScheduleError);
   });
 });

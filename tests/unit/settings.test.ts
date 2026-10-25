@@ -52,9 +52,9 @@ describe('settings', () => {
     expect(r.errors.count).toMatch(/число сигналов/i);
   });
 
-  it('TC-06: maxSignals: 60 с, все типы, g = 2,5 с → 17', () => {
-    // floor((60 − 4 − 1 + 2,5) / (0,83 + 2,5)) = floor(57,5 / 3,33) = 17
-    expect(maxSignals(s({ durationSec: 60, gapSec: 2.5 }))).toBe(17);
+  it('TC-06: maxSignals: 60 с, все типы, g = 2,5 с → 18', () => {
+    // floor((60 − 4 − 1 + 2,5) / (0,59 + 2,5)) = floor(57,5 / 3,09) = 18
+    expect(maxSignals(s({ durationSec: 60, gapSec: 2.5 }))).toBe(18);
   });
 
   it('TC-07: maxSignals: 60 с, только «Короткий свисток» → 21 (максимум зависит от самого длинного типа)', () => {
@@ -63,12 +63,12 @@ describe('settings', () => {
     expect(maxSignals(s({ durationSec: 60, types: ['whistle1', 'whistle2'] }))).toBe(20);
   });
 
-  it('TC-08: N = Nмакс валидно; N = Nмакс + 1 — ошибка «максимум 17»', () => {
-    expect(validate(s({ count: 17 })).valid).toBe(true);
-    const r = validate(s({ count: 18 }));
+  it('TC-08: N = Nмакс валидно; N = Nмакс + 1 — ошибка «максимум 18»', () => {
+    expect(validate(s({ count: 18 })).valid).toBe(true);
+    const r = validate(s({ count: 19 }));
     expect(r.valid).toBe(false);
-    expect(r.errors.count).toContain('максимум 17');
-    expect(r.maxSignals).toBe(17);
+    expect(r.errors.count).toContain('максимум 18');
+    expect(r.maxSignals).toBe(18);
   });
 
   it('TC-09: при любых допустимых T, типах, g — Nмакс ≥ 1 (property)', () => {

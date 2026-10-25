@@ -1,4 +1,4 @@
-export type SignalType = 'whistle1' | 'whistle2' | 'shortLong' | 'tutu' | 'train';
+export type SignalType = 'whistle1' | 'whistle2' | 'shortLong' | 'train' | 'tutu';
 export type SoundId = SignalType | 'finish';
 
 export interface SignalInfo {
@@ -14,8 +14,8 @@ export const SIGNAL_TYPES: readonly SignalType[] = [
   'whistle1',
   'whistle2',
   'shortLong',
-  'tutu',
   'train',
+  'tutu',
 ];
 
 export const SOUND_IDS: readonly SoundId[] = [...SIGNAL_TYPES, 'finish'];
@@ -27,9 +27,9 @@ export const SIGNALS: Readonly<Record<SoundId, SignalInfo>> = {
     code: 'shortLong',
     name: 'Короткий-длинный',
     file: 'shortLong.wav',
-    durationMs: 830,
+    durationMs: 590,
   },
-  tutu: { code: 'tutu', name: 'Ту-ту', file: 'tutu.wav', durationMs: 680 },
+  tutu: { code: 'tutu', name: 'Ту-ту', file: 'tutu.wav', durationMs: 430 },
   train: { code: 'train', name: 'Ту', file: 'train.wav', durationMs: 450 },
   finish: { code: 'finish', name: 'Финиш', file: 'finish.wav', durationMs: 1500 },
 };

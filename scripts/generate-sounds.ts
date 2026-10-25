@@ -78,8 +78,8 @@ const toot = (ms: number): Tone => ({
 export const DESIGN: Record<SoundId, Part[]> = {
   whistle1: [whistle(200)],
   whistle2: [whistle(150), rest(70), whistle(150)],
-  shortLong: [whistle(150), rest(80), whistle(600)],
-  tutu: [toot(220), rest(80), toot(380)],
+  shortLong: [whistle(120), rest(70), whistle(400)],
+  tutu: [toot(150), rest(60), toot(220)],
   train: [toot(450)],
   finish: [{ kind: 'tone', ms: 1500, freqs: [1200], wave: 'saw', altFreq: 800, altEveryMs: 125 }],
 };
