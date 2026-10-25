@@ -36,12 +36,12 @@ describe('UI', () => {
 
   it('TC-41: подсказка максимума видна под полем и пересчитывается при смене длительности и типов', () => {
     const s = screen(h, 'settings');
-    expect(hint(h)).toBe('Максимум для этих настроек: 19');
+    expect(hint(h)).toBe('Максимум для этих настроек: 17');
     fireEvent.click(getByRole(s, 'button', { name: '2 мин' }));
-    // floor((120 − 5 + 2,5) / 2,95) = 39
-    expect(hint(h)).toBe('Максимум для этих настроек: 39');
+    // floor((120 − 5 + 2,5) / 3,3) = 35
+    expect(hint(h)).toBe('Максимум для этих настроек: 35');
     fireEvent.click(getByRole(s, 'button', { name: '1 мин' }));
-    for (const t of ['whistle1', 'whistle2', 'horn1', 'scream'] as const) {
+    for (const t of ['whistle1', 'whistle2', 'whistleLong', 'bibeep'] as const) {
       fireEvent.click(getByLabelText(s, SIGNALS[t].name));
     }
     // only «Кря»: floor(57,5 / 2,7) = 21
@@ -58,9 +58,9 @@ describe('UI', () => {
     expect(startBtn(h).disabled).toBe(false);
 
     const count = getByLabelText(s, 'Число сигналов') as HTMLInputElement;
-    fireEvent.input(count, { target: { value: '20' } });
+    fireEvent.input(count, { target: { value: '18' } });
     expect(startBtn(h).disabled).toBe(true);
-    expect(s.querySelector('#count-error')!.textContent).toContain('максимум 19');
+    expect(s.querySelector('#count-error')!.textContent).toContain('максимум 17');
     expect(count.getAttribute('aria-describedby')).toContain('count-error');
     fireEvent.input(count, { target: { value: '10' } });
     expect(startBtn(h).disabled).toBe(false);
@@ -84,11 +84,11 @@ describe('UI', () => {
 
   it('TC-43: кнопка «прослушать» играет именно свой сигнал', () => {
     const s = screen(h, 'settings');
-    for (const t of ['whistle1', 'whistle2', 'horn1', 'quack', 'scream'] as const) {
+    for (const t of ['whistle1', 'whistle2', 'whistleLong', 'bibeep', 'quack'] as const) {
       fireEvent.click(getByRole(s, 'button', { name: `Прослушать «${SIGNALS[t].name}»` }));
       expect(h.played.at(-1)).toBe(t);
     }
-    expect(h.played).toEqual(['whistle1', 'whistle2', 'horn1', 'quack', 'scream']);
+    expect(h.played).toEqual(['whistle1', 'whistle2', 'whistleLong', 'bibeep', 'quack']);
   });
 
   it('TC-44: на экране «Идёт» время следующего сигнала нигде не показано', () => {

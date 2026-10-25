@@ -16,7 +16,7 @@ type Wave = 'square' | 'saw' | 'sine';
 interface Tone {
   kind: 'tone';
   ms: number;
-  /** One or more frequencies, mixed together (gives a "harsh" horn). */
+  /** One or more frequencies, mixed together (detuned pairs sound harsh). */
   freqs: number[];
   wave: Wave;
   /** Optional frequency alternation for the finish siren. */
@@ -55,13 +55,24 @@ const whistle = (ms: number): Tone => ({
 });
 export const rest = (ms: number): Rest => ({ kind: 'rest', ms });
 
+/** Harsh electronic chirp: two clashing square tones, overdriven. */
+const harsh = (ms: number): Tone => ({
+  kind: 'tone',
+  ms,
+  freqs: [1250, 1330],
+  wave: 'square',
+  drive: 5,
+});
+
 /**
- * Each signal has its own timbre: high trilled whistle, distorted low horn, bright nasal falling
- * quack, raspy "a-a-a" scream. Keep signals.ts durations in sync (TC-23).
+ * Three whistles differ by length and count; "bi-beep" is a harsh electronic double chirp;
+ * the quack is bright, nasal and falling. Keep signals.ts durations in sync (TC-23).
  */
 export const DESIGN: Record<SoundId, Part[]> = {
-  whistle1: [whistle(280)],
+  whistle1: [whistle(200)],
   whistle2: [whistle(150), rest(70), whistle(150)],
+  whistleLong: [whistle(800)],
+  bibeep: [harsh(90), rest(50), harsh(130)],
   quack: [
     {
       kind: 'tone',
@@ -78,27 +89,6 @@ export const DESIGN: Record<SoundId, Part[]> = {
         mix: 0.85,
       },
       drive: 2.5,
-    },
-  ],
-  horn1: [{ kind: 'tone', ms: 350, freqs: [196, 198.5, 294, 392.7], wave: 'square', drive: 6 }],
-  scream: [
-    {
-      kind: 'tone',
-      ms: 450,
-      freqs: [440, 443],
-      wave: 'saw',
-      glide: 0.85,
-      trill: { hz: 7, pitch: 0.04, depth: 0.1 },
-      noise: 0.25,
-      formants: {
-        peaks: [
-          [900, 6, 1],
-          [1350, 7, 0.8],
-          [2700, 8, 0.5],
-        ],
-        mix: 0.9,
-      },
-      drive: 3,
     },
   ],
   finish: [{ kind: 'tone', ms: 1500, freqs: [1200], wave: 'saw', altFreq: 800, altEveryMs: 125 }],

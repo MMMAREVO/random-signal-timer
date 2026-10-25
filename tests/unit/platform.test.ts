@@ -197,7 +197,7 @@ describe('storage', () => {
   const custom = {
     ...defaultSettings(),
     durationSec: 125,
-    types: ['whistle1', 'horn1'] as const,
+    types: ['whistle1', 'bibeep'] as const,
     count: 7,
     gapSec: 3,
     countdownSec: 10 as const,

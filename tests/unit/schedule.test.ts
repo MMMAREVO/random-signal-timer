@@ -166,7 +166,7 @@ describe('generateSchedule', () => {
   });
 
   it('TC-19: равномерность типов (10 000 сигналов, 3 типа) — доля каждого 33 % ± 3 %', () => {
-    const types: SignalType[] = ['whistle1', 'whistle2', 'horn1'];
+    const types: SignalType[] = ['whistle1', 'whistle2', 'bibeep'];
     const settings = s({ durationSec: 60, types, count: 10 });
     const counts = new Map<SignalType, number>();
     let total = 0;
@@ -184,9 +184,9 @@ describe('generateSchedule', () => {
     }
   });
 
-  it('TC-20: N = Nмакс, только самый длинный тип («Крик») — расписание строится, правила соблюдены', () => {
+  it('TC-20: N = Nмакс, только самый длинный тип («Длинный свисток») — расписание строится, правила соблюдены', () => {
     for (const durationSec of [10, 60, 300, 3600]) {
-      const base = s({ durationSec, types: ['scream'] });
+      const base = s({ durationSec, types: ['whistleLong'] });
       const settings = { ...base, count: maxSignals(base) };
       for (let sd = 0; sd < 100; sd++) {
         const ev = generateSchedule(settings, mulberry32(sd));
@@ -203,9 +203,9 @@ describe('generateSchedule', () => {
   });
 
   it('TC-21: N > Nмакс напрямую в функцию — понятная ошибка, без зависания', () => {
-    const settings = s({ count: 20 });
+    const settings = s({ count: 18 });
     expect(() => generateSchedule(settings, mulberry32(1))).toThrow(ScheduleError);
-    expect(() => generateSchedule(settings, mulberry32(1))).toThrow(/максимум 19/);
+    expect(() => generateSchedule(settings, mulberry32(1))).toThrow(/максимум 17/);
     expect(() => generateSchedule(s({ count: 10_000 }), mulberry32(1))).toThrow(ScheduleError);
   });
 });
