@@ -38,7 +38,7 @@ test.describe('сквозные сценарии', () => {
     page,
   }) => {
     await page.getByRole('button', { name: '1 мин' }).click();
-    await page.getByRole('checkbox', { name: '3 бипа', exact: true }).uncheck();
+    await page.getByRole('checkbox', { name: 'Кря', exact: true }).uncheck();
     await page.getByRole('checkbox', { name: 'Ту-ту', exact: true }).uncheck();
     await page.getByLabel('Число сигналов').fill('10');
     await page.getByRole('button', { name: 'Старт' }).click();
@@ -49,13 +49,13 @@ test.describe('сквозные сценарии', () => {
     const p = await played(page);
     const sigs = signalsOnly(p);
     expect(sigs).toHaveLength(10);
-    for (const s of sigs) expect(['beep1.wav', 'beep2.wav', 'horn1.wav']).toContain(s.file);
+    for (const s of sigs) expect(['whistle1.wav', 'whistle2.wav', 'horn1.wav']).toContain(s.file);
     expect(new Set(sigs.map((s) => s.file)).size).toBe(3);
     expect(p.filter((x) => x.file === 'finish.wav')).toHaveLength(1);
     expect(p.at(-1)!.file).toBe('finish.wav');
     await expect(page.getByRole('listitem')).toHaveCount(10);
     await expect(page.getByRole('listitem').first()).toHaveText(
-      /^\d\d:\d\d — (1 бип|2 бипа|1 гудок)$/,
+      /^\d\d:\d\d — (1 свисток|2 свистка|Гудок)$/,
     );
   });
 
@@ -108,7 +108,7 @@ test.describe('сквозные сценарии', () => {
     await page.reload();
     await expect(page.getByLabel('Длительность')).toHaveValue('2:00');
     await expect(page.getByRole('checkbox', { name: 'Ту-ту', exact: true })).not.toBeChecked();
-    await expect(page.getByRole('checkbox', { name: '1 бип', exact: true })).toBeChecked();
+    await expect(page.getByRole('checkbox', { name: '1 свисток', exact: true })).toBeChecked();
     await expect(page.getByLabel('Число сигналов')).toHaveValue('7');
   });
 

@@ -26,6 +26,14 @@ interface Tone {
   partials?: Array<[number, number]>;
   /** Exponential decay time constant — a struck, percussive sound instead of a flat tone. */
   decayMs?: number;
+  /** Pitch at the end relative to the start (linear glide), e.g. 0.75 for a falling "quack". */
+  glide?: number;
+  /** Pitch and loudness wobble — the rattling pea of a referee whistle. */
+  trill?: { hz: number; pitch: number; depth: number };
+  /** Breath noise mixed in, as a share of the tone. */
+  noise?: number;
+  /** Resonant band-pass (nasal formant) mixed over the dry tone. */
+  formant?: { hz: number; q: number; mix: number };
 }
 interface Rest {
   kind: 'rest';
@@ -33,29 +41,36 @@ interface Rest {
 }
 export type Part = Tone | Rest;
 
-/** Rounded 1 kHz tone (sine + odd harmonics), as in gym interval timers. */
-const sportPip: Tone = {
+/** Referee pea whistle: piercing ~2.9 kHz with a fast trill and some breath. */
+const whistle = (ms: number): Tone => ({
   kind: 'tone',
-  ms: 110,
-  freqs: [1000],
+  ms,
+  freqs: [2900],
   wave: 'sine',
-  partials: [
-    [3, 0.3],
-    [5, 0.1],
-  ],
-};
-/** Plain electronic 1 kHz pip. */
-const squarePip: Tone = { kind: 'tone', ms: 90, freqs: [1000], wave: 'square' };
+  partials: [[2, 0.12]],
+  trill: { hz: 38, pitch: 0.035, depth: 0.45 },
+  noise: 0.06,
+});
 export const rest = (ms: number): Rest => ({ kind: 'rest', ms });
 
 /**
- * Chosen by ear (scripts/preview-beeps.ts): each beep signal has its own timbre — high square,
- * rounded tone, low square; "tu-tu" is mid, the horn is low. Keep signals.ts durations in sync (TC-23).
+ * Each signal has its own timbre: high trilled whistle, low horn, nasal falling quack,
+ * mid two-note "tu-tu". Keep signals.ts durations in sync (TC-23).
  */
 export const DESIGN: Record<SoundId, Part[]> = {
-  beep1: [{ kind: 'tone', ms: 100, freqs: [1800], wave: 'square' }],
-  beep2: [sportPip, rest(70), sportPip],
-  beep3: [squarePip, rest(60), squarePip, rest(60), squarePip],
+  whistle1: [whistle(280)],
+  whistle2: [whistle(150), rest(70), whistle(150)],
+  quack: [
+    {
+      kind: 'tone',
+      ms: 220,
+      freqs: [430, 434],
+      wave: 'saw',
+      glide: 0.72,
+      decayMs: 260,
+      formant: { hz: 1300, q: 4, mix: 0.8 },
+    },
+  ],
   horn1: [{ kind: 'tone', ms: 350, freqs: [220, 221.5, 330], wave: 'saw' }],
   tutu: [
     { kind: 'tone', ms: 150, freqs: [1047], wave: 'square' },
@@ -74,26 +89,59 @@ function osc(t: Tone, phase: number): number {
   return v;
 }
 
+/** Deterministic white noise, so regenerated WAVs are byte-identical. */
+function noiseSource(seed = 1): () => number {
+  let x = seed;
+  return () => {
+    x = (Math.imul(x, 1664525) + 1013904223) >>> 0;
+    return (x / 2 ** 32) * 2 - 1;
+  };
+}
+
+/** RBJ band-pass biquad (constant 0 dB peak gain). */
+function bandPass(input: Float32Array, hz: number, q: number): Float32Array {
+  const w = (2 * Math.PI * hz) / SAMPLE_RATE;
+  const alpha = Math.sin(w) / (2 * q);
+  const a0 = 1 + alpha;
+  const [b0, b2, a1, a2] = [alpha / a0, -alpha / a0, (-2 * Math.cos(w)) / a0, (1 - alpha) / a0];
+  const out = new Float32Array(input.length);
+  let [x1, x2, y1, y2] = [0, 0, 0, 0];
+  input.forEach((x, i) => {
+    const y = b0 * x + b2 * x2 - a1 * y1 - a2 * y2;
+    [x2, x1, y2, y1] = [x1, x, y1, y];
+    out[i] = y;
+  });
+  return out;
+}
+
 function renderTone(t: Tone): Float32Array {
   const n = Math.round((t.ms / 1000) * SAMPLE_RATE);
   const out = new Float32Array(n);
   const fade = Math.round((FADE_MS / 1000) * SAMPLE_RATE);
   const phases = t.freqs.map(() => 0);
+  const noise = noiseSource();
   for (let i = 0; i < n; i++) {
     const ms = (i / SAMPLE_RATE) * 1000;
     const useAlt =
       t.altFreq !== undefined && t.altEveryMs && Math.floor(ms / t.altEveryMs) % 2 === 1;
+    const trill = t.trill ? Math.sin((2 * Math.PI * t.trill.hz * ms) / 1000) : 0;
+    const bend = (1 + ((t.glide ?? 1) - 1) * (i / n)) * (1 + (t.trill?.pitch ?? 0) * trill);
     let v = 0;
     t.freqs.forEach((f, k) => {
-      const freq = useAlt ? (t.altFreq as number) * (f / (t.freqs[0] as number)) : f;
-      phases[k] = (phases[k] as number) + freq / SAMPLE_RATE;
+      const base = useAlt ? (t.altFreq as number) * (f / (t.freqs[0] as number)) : f;
+      phases[k] = (phases[k] as number) + (base * bend) / SAMPLE_RATE;
       v += osc(t, phases[k] as number);
     });
+    v = v / t.freqs.length + (t.noise ?? 0) * noise();
+    const am = t.trill ? 1 - t.trill.depth * (0.5 - 0.5 * trill) : 1;
     const decay = t.decayMs ? Math.exp(-ms / t.decayMs) : 1;
-    const env = Math.min(1, i / fade, (n - 1 - i) / fade) * decay;
-    out[i] = (v / t.freqs.length) * Math.max(0, env);
+    const env = Math.min(1, i / fade, (n - 1 - i) / fade) * decay * am;
+    out[i] = v * Math.max(0, env);
   }
-  return out;
+  if (!t.formant) return out;
+  const { hz, q, mix } = t.formant;
+  const wet = bandPass(out, hz, q);
+  return out.map((v, i) => (1 - mix) * v + mix * 3 * (wet[i] as number));
 }
 
 export function renderSound(id: SoundId): Float32Array {

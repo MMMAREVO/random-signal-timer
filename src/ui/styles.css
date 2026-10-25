@@ -11,9 +11,9 @@
   --btn: #00c853;
   --btn-fg: #000;
   --btn-dark: #0b2e18;
-  --c-beep1: #00e5ff;
-  --c-beep2: #00e676;
-  --c-beep3: #b2ff59;
+  --c-whistle1: #00e5ff;
+  --c-whistle2: #00e676;
+  --c-quack: #b2ff59;
   --c-horn1: #ff9100;
   --c-tutu: #ff4fa3;
   --radius: 14px;
@@ -238,14 +238,14 @@ input[type='number']::-webkit-outer-spin-button {
   background: var(--sw, var(--muted));
 }
 
-.signal-row[data-type='beep1'] {
-  --sw: var(--c-beep1);
+.signal-row[data-type='whistle1'] {
+  --sw: var(--c-whistle1);
 }
-.signal-row[data-type='beep2'] {
-  --sw: var(--c-beep2);
+.signal-row[data-type='whistle2'] {
+  --sw: var(--c-whistle2);
 }
-.signal-row[data-type='beep3'] {
-  --sw: var(--c-beep3);
+.signal-row[data-type='quack'] {
+  --sw: var(--c-quack);
 }
 .signal-row[data-type='horn1'] {
   --sw: var(--c-horn1);
@@ -434,14 +434,14 @@ input[type='number']::-webkit-outer-spin-button {
   display: none;
 }
 
-.flash[data-type='beep1'] {
-  --flash: var(--c-beep1);
+.flash[data-type='whistle1'] {
+  --flash: var(--c-whistle1);
 }
-.flash[data-type='beep2'] {
-  --flash: var(--c-beep2);
+.flash[data-type='whistle2'] {
+  --flash: var(--c-whistle2);
 }
-.flash[data-type='beep3'] {
-  --flash: var(--c-beep3);
+.flash[data-type='quack'] {
+  --flash: var(--c-quack);
 }
 .flash[data-type='horn1'] {
   --flash: var(--c-horn1);
@@ -485,14 +485,14 @@ input[type='number']::-webkit-outer-spin-button {
   margin-bottom: 6px;
 }
 
-.log li[data-type='beep1'] {
-  --sw: var(--c-beep1);
+.log li[data-type='whistle1'] {
+  --sw: var(--c-whistle1);
 }
-.log li[data-type='beep2'] {
-  --sw: var(--c-beep2);
+.log li[data-type='whistle2'] {
+  --sw: var(--c-whistle2);
 }
-.log li[data-type='beep3'] {
-  --sw: var(--c-beep3);
+.log li[data-type='quack'] {
+  --sw: var(--c-quack);
 }
 .log li[data-type='horn1'] {
   --sw: var(--c-horn1);

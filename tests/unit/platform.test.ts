@@ -72,9 +72,9 @@ describe('audio', () => {
   it('TC-35: play() сразу после unlock() не глушится разблокировкой', async () => {
     const { player, els } = fakePlayer();
     player.unlock();
-    await player.play('beep2');
+    await player.play('whistle2');
     await Promise.resolve();
-    const el = els.find((e) => e.src.endsWith('beep2.wav'))!;
+    const el = els.find((e) => e.src.endsWith('whistle2.wav'))!;
     expect(el.plays.at(-1)).toEqual({ muted: false });
     expect(el.paused).toBe(false);
   });
@@ -83,7 +83,7 @@ describe('audio', () => {
     const { player } = fakePlayer(true);
     const blocked = vi.fn();
     player.onBlocked(blocked);
-    await expect(player.play('beep1')).rejects.toThrow();
+    await expect(player.play('whistle1')).rejects.toThrow();
     expect(blocked).toHaveBeenCalledTimes(1);
   });
 });
@@ -197,7 +197,7 @@ describe('storage', () => {
   const custom = {
     ...defaultSettings(),
     durationSec: 125,
-    types: ['beep1', 'horn1'] as const,
+    types: ['whistle1', 'horn1'] as const,
     count: 7,
     gapSec: 3,
     countdownSec: 10 as const,
