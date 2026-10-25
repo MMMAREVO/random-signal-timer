@@ -73,22 +73,22 @@ export const DESIGN: Record<SoundId, Part[]> = {
   whistle2: [whistle(150), rest(70), whistle(150)],
   whistleLong: [whistle(800)],
   bibeep: [harsh(90), rest(50), harsh(130)],
-  // Mallard quack: low nasal buzz with a raspy flutter, falling pitch, fast attack.
+  // Duck quack: high nasal buzz with a raspy flutter, falling pitch, fast attack.
   quack: [
     {
       kind: 'tone',
       ms: 200,
-      freqs: [310, 313],
+      freqs: [660, 666],
       wave: 'saw',
       glide: 0.8,
-      trill: { hz: 55, pitch: 0.02, depth: 0.5 },
+      trill: { hz: 80, pitch: 0.02, depth: 0.5 },
       noise: 0.15,
       decayMs: 260,
       formants: {
         peaks: [
-          [1100, 4, 1],
-          [2500, 5, 0.8],
-          [3500, 6, 0.3],
+          [1900, 4, 1],
+          [3600, 5, 0.8],
+          [5200, 6, 0.3],
         ],
         mix: 0.95,
       },
