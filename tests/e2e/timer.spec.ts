@@ -27,7 +27,9 @@ async function prepare(page: Page) {
 
 const played = (page: Page) =>
   page.evaluate(() => (window as unknown as { __played: PlayedSound[] }).__played);
-const signalsOnly = (p: PlayedSound[]) => p.filter((x) => x.file !== 'finish.wav');
+const signalsOnly = (p: PlayedSound[]) =>
+  p.filter((x) => x.file !== 'tick.wav' && x.file !== 'gong.wav');
+const gongs = (p: PlayedSound[]) => p.filter((x) => x.file === 'gong.wav');
 
 test.describe('сквозные сценарии', () => {
   test.beforeEach(async ({ page }) => {
@@ -51,8 +53,9 @@ test.describe('сквозные сценарии', () => {
     expect(sigs).toHaveLength(10);
     for (const s of sigs) expect(['whistle1.wav', 'whistle2.wav', 'tutu.wav']).toContain(s.file);
     expect(new Set(sigs.map((s) => s.file)).size).toBe(3);
-    expect(p.filter((x) => x.file === 'finish.wav')).toHaveLength(1);
-    expect(p.at(-1)!.file).toBe('finish.wav');
+    expect(p.filter((x) => x.file === 'tick.wav')).toHaveLength(5);
+    expect(gongs(p)).toHaveLength(2);
+    expect(p.at(-1)!.file).toBe('gong.wav');
     await expect(page.getByRole('listitem')).toHaveCount(10);
     await expect(page.getByRole('listitem').first()).toHaveText(
       /^\d\d:\d\d — (Короткий свисток|2 свистка|Ту-ту)$/,
@@ -92,12 +95,12 @@ test.describe('сквозные сценарии', () => {
     expect(await played(page)).toHaveLength(during);
     await page.getByRole('button', { name: 'Продолжить' }).click();
     await page.clock.runFor(39_000);
-    expect((await played(page)).some((x) => x.file === 'finish.wav')).toBe(false);
+    expect(gongs(await played(page))).toHaveLength(1);
     await page.clock.runFor(2_000);
     await expect(page.getByRole('heading', { name: 'Готово' })).toBeVisible();
     const p = await played(page);
     expect(signalsOnly(p)).toHaveLength(10);
-    const finish = p.find((x) => x.file === 'finish.wav')!;
+    const finish = gongs(p).at(-1)!;
     expect(Math.abs(finish.t - t0 - (5000 + 60_000 + 15_000))).toBeLessThan(1000);
   });
 

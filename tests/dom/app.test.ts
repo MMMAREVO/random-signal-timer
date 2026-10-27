@@ -7,7 +7,7 @@ import {
   queryByRole,
   within,
 } from '@testing-library/dom';
-import { SIGNALS } from '../../src/domain/signals';
+import { SIGNAL_TYPES, SIGNALS } from '../../src/domain/signals';
 import { AUDIO_BLOCKED_TEXT, FLASH_MS } from '../../src/ui/app';
 import { formatClock } from '../../src/ui/format';
 import { mountApp, type Harness } from '../helpers/appHarness';
@@ -72,7 +72,7 @@ describe('UI', () => {
     fireEvent.input(dur, { target: { value: '1:00' } });
     expect(startBtn(h).disabled).toBe(false);
 
-    for (const t of Object.values(SIGNALS).filter((x) => x.code !== 'finish')) {
+    for (const t of SIGNAL_TYPES.map((id) => SIGNALS[id])) {
       fireEvent.click(getByLabelText(s, t.name));
     }
     expect(startBtn(h).disabled).toBe(true);
@@ -166,7 +166,7 @@ describe('UI', () => {
         `${formatClock(schedule[i]!.atMs)} — ${SIGNALS[schedule[i]!.type].name}`,
       );
     });
-    expect(h.played.filter((p) => p === 'finish')).toHaveLength(1);
+    expect(h.played.filter((p) => p === 'gong')).toHaveLength(2);
   });
 
   it('переходы по схеме: Повторить и К настройкам с экрана финиша', () => {

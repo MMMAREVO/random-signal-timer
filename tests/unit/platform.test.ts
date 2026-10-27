@@ -43,7 +43,7 @@ function fakePlayer(reject = false) {
 }
 
 describe('audio', () => {
-  it('TC-35: unlock() трогает все 6 звуков (беззвучно) и возвращает их в исходное состояние', async () => {
+  it('TC-35: unlock() трогает все 7 звуков (беззвучно) и возвращает их в исходное состояние', async () => {
     const nav = { audioSession: { type: 'auto' } };
     const els: FakeAudio[] = [];
     const player = createAudioPlayer({
@@ -56,7 +56,7 @@ describe('audio', () => {
       nav: nav as unknown as Navigator,
     });
     expect(els).toHaveLength(SOUND_IDS.length);
-    expect(els).toHaveLength(6);
+    expect(els).toHaveLength(7);
     player.unlock();
     for (const el of els) expect(el.plays).toEqual([{ muted: true }]);
     await Promise.resolve();

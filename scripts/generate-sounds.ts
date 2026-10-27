@@ -19,9 +19,6 @@ interface Tone {
   /** One or more frequencies, mixed together (detuned pairs sound harsh). */
   freqs: number[];
   wave: Wave;
-  /** Optional frequency alternation for the finish siren. */
-  altFreq?: number;
-  altEveryMs?: number;
   /** For 'sine': extra partials as [frequency ratio, amplitude]; non-integer ratios give a bell. */
   partials?: Array<[number, number]>;
   /** Exponential decay time constant — a struck, percussive sound instead of a flat tone. */
@@ -43,15 +40,19 @@ interface Rest {
 }
 export type Part = Tone | Rest;
 
-/** Referee pea whistle: piercing ~2.9 kHz with a fast trill and some breath. */
+/** Referee pea whistle: piercing ~3.4 kHz, bright overtones, fast trill, overdriven. */
 const whistle = (ms: number): Tone => ({
   kind: 'tone',
   ms,
-  freqs: [2900],
+  freqs: [3400],
   wave: 'sine',
-  partials: [[2, 0.12]],
-  trill: { hz: 38, pitch: 0.035, depth: 0.45 },
-  noise: 0.06,
+  partials: [
+    [2, 0.3],
+    [3, 0.12],
+  ],
+  trill: { hz: 40, pitch: 0.03, depth: 0.3 },
+  noise: 0.04,
+  drive: 3,
 });
 export const rest = (ms: number): Rest => ({ kind: 'rest', ms });
 
@@ -81,7 +82,37 @@ export const DESIGN: Record<SoundId, Part[]> = {
   shortLong: [whistle(120), rest(70), whistle(400)],
   tutu: [toot(150), rest(60), toot(220)],
   train: [toot(450)],
-  finish: [{ kind: 'tone', ms: 1500, freqs: [1200], wave: 'saw', altFreq: 800, altEveryMs: 125 }],
+  // Countdown: short wooden "tick" every second.
+  tick: [
+    {
+      kind: 'tone',
+      ms: 40,
+      freqs: [1900],
+      wave: 'sine',
+      partials: [[2.7, 0.5]],
+      noise: 0.4,
+      decayMs: 8,
+    },
+  ],
+  // Start and finish: struck gong — inharmonic partials, slow shimmer, long ring.
+  gong: [
+    {
+      kind: 'tone',
+      ms: 2500,
+      freqs: [220, 221.3],
+      wave: 'sine',
+      partials: [
+        [2.0, 0.6],
+        [2.76, 0.8],
+        [4.07, 0.5],
+        [5.4, 0.35],
+        [6.8, 0.2],
+      ],
+      noise: 0.05,
+      decayMs: 750,
+      drive: 2,
+    },
+  ],
 };
 
 function osc(t: Tone, phase: number): number {
@@ -126,14 +157,11 @@ function renderTone(t: Tone): Float32Array {
   const noise = noiseSource();
   for (let i = 0; i < n; i++) {
     const ms = (i / SAMPLE_RATE) * 1000;
-    const useAlt =
-      t.altFreq !== undefined && t.altEveryMs && Math.floor(ms / t.altEveryMs) % 2 === 1;
     const trill = t.trill ? Math.sin((2 * Math.PI * t.trill.hz * ms) / 1000) : 0;
     const bend = (1 + ((t.glide ?? 1) - 1) * (i / n)) * (1 + (t.trill?.pitch ?? 0) * trill);
     let v = 0;
     t.freqs.forEach((f, k) => {
-      const base = useAlt ? (t.altFreq as number) * (f / (t.freqs[0] as number)) : f;
-      phases[k] = (phases[k] as number) + (base * bend) / SAMPLE_RATE;
+      phases[k] = (phases[k] as number) + (f * bend) / SAMPLE_RATE;
       v += osc(t, phases[k] as number);
     });
     v = v / t.freqs.length + (t.noise ?? 0) * noise();

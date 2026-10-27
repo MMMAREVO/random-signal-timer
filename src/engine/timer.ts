@@ -60,6 +60,8 @@ export class Timer {
   private segmentStart = 0;
   private runOffset = 0;
   private pausedFrom: 'countdown' | 'running' = 'running';
+  /** Countdown second that has already ticked, so each second ticks exactly once. */
+  private tickedSec = 0;
   private readonly tickMs: number;
 
   constructor(private readonly deps: TimerDeps) {
@@ -167,13 +169,16 @@ export class Timer {
       return;
     }
     this.countdownStart = this.deps.clock.now();
+    this.tickedSec = 0;
     this.setState('countdown');
     this.step();
   }
 
+  /** Session start (after the countdown, not after a pause): gong, then the schedule runs. */
   private enterRunning(): void {
     this.runOffset = 0;
     this.segmentStart = this.deps.clock.now();
+    this.play('gong');
     this.setState('running');
     this.step();
   }
@@ -187,8 +192,14 @@ export class Timer {
         this.enterRunning();
         return;
       }
+      const sec = Math.ceil(left / 1000);
+      if (sec !== this.tickedSec) {
+        this.tickedSec = sec;
+        this.play('tick');
+      }
       this.emitTick();
-      this.arm(Math.min(this.tickMs, left));
+      // wake exactly on the next whole second so the tick is on time
+      this.arm(Math.min(this.tickMs, left - (sec - 1) * 1000));
       return;
     }
     if (this._state !== 'running') return;
@@ -209,7 +220,7 @@ export class Timer {
 
     const T = this.durationMs();
     if (elapsed >= T) {
-      this.play('finish');
+      this.play('gong');
       this.setState('finished');
       this.emitTick();
       this.deps.events?.onFinish?.([...this.log]);

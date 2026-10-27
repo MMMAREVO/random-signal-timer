@@ -1,5 +1,6 @@
 export type SignalType = 'whistle1' | 'whistle2' | 'shortLong' | 'train' | 'tutu';
-export type SoundId = SignalType | 'finish';
+/** Signals plus service sounds: countdown tick and the start / finish gong. */
+export type SoundId = SignalType | 'tick' | 'gong';
 
 export interface SignalInfo {
   code: SoundId;
@@ -18,7 +19,7 @@ export const SIGNAL_TYPES: readonly SignalType[] = [
   'tutu',
 ];
 
-export const SOUND_IDS: readonly SoundId[] = [...SIGNAL_TYPES, 'finish'];
+export const SOUND_IDS: readonly SoundId[] = [...SIGNAL_TYPES, 'tick', 'gong'];
 
 export const SIGNALS: Readonly<Record<SoundId, SignalInfo>> = {
   whistle1: { code: 'whistle1', name: 'Короткий свисток', file: 'whistle1.wav', durationMs: 200 },
@@ -31,7 +32,8 @@ export const SIGNALS: Readonly<Record<SoundId, SignalInfo>> = {
   },
   tutu: { code: 'tutu', name: 'Ту-ту', file: 'tutu.wav', durationMs: 430 },
   train: { code: 'train', name: 'Ту', file: 'train.wav', durationMs: 450 },
-  finish: { code: 'finish', name: 'Финиш', file: 'finish.wav', durationMs: 1500 },
+  tick: { code: 'tick', name: 'Тик', file: 'tick.wav', durationMs: 40 },
+  gong: { code: 'gong', name: 'Гонг', file: 'gong.wav', durationMs: 2500 },
 };
 
 export function isSignalType(value: unknown): value is SignalType {

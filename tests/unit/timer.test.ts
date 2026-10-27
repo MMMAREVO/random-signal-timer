@@ -43,7 +43,8 @@ function setup(patch: Partial<Settings> = {}) {
   };
 }
 
-const signals = (p: Played[]) => p.filter((x) => x.id !== 'finish');
+const signals = (p: Played[]) => p.filter((x) => x.id !== 'tick' && x.id !== 'gong');
+const gongs = (p: Played[]) => p.filter((x) => x.id === 'gong');
 
 describe('timer engine', () => {
   let t: ReturnType<typeof setup>;
@@ -51,21 +52,35 @@ describe('timer engine', () => {
     t = setup();
   });
 
-  it('TC-26: старт → «Отсчёт», через 5 с → «Идёт»', () => {
+  it('TC-26: старт → «Отсчёт» с тиканьем каждую секунду, через 5 с → «Идёт» и гонг', () => {
     expect(t.timer.state).toBe('settings');
+    const t0 = t.clock.now();
     t.timer.start(t.settings);
     expect(t.timer.state).toBe('countdown');
     t.clock.advance(4999);
     expect(t.timer.state).toBe('countdown');
+    expect(t.played).toEqual([0, 1000, 2000, 3000, 4000].map((d) => ({ id: 'tick', at: t0 + d })));
     t.clock.advance(1);
     expect(t.timer.state).toBe('running');
-    expect(t.played).toHaveLength(0); // countdown is silent
+    expect(t.played.slice(5)).toEqual([{ id: 'gong', at: t0 + 5000 }]);
   });
 
-  it('TC-26: отсчёт 0 с — сразу «Идёт»', () => {
+  it('TC-26: отсчёт 0 с — сразу «Идёт» с гонгом, без тиканья', () => {
     const z = setup({ countdownSec: 0 });
     z.timer.start(z.settings);
     expect(z.timer.state).toBe('running');
+    expect(z.played).toEqual([{ id: 'gong', at: z.clock.now() }]);
+  });
+
+  it('TC-26: пауза во время отсчёта → «Продолжить» — отсчёт тикает заново, гонг один', () => {
+    t.timer.start(t.settings);
+    t.clock.advance(2500);
+    t.timer.pause();
+    t.clock.advance(10_000);
+    expect(t.played.map((p) => p.id)).toEqual(['tick', 'tick', 'tick']);
+    t.timer.resume();
+    t.clock.advance(5000);
+    expect(t.played.map((p) => p.id)).toEqual([...Array<string>(8).fill('tick'), 'gong']);
   });
 
   it('TC-27: каждый сигнал звучит ровно один раз, в своё время ± 50 мс', () => {
@@ -81,14 +96,15 @@ describe('timer engine', () => {
     });
   });
 
-  it('TC-28: конец периода → «Финиш» + звук finish один раз; после него тишина', () => {
+  it('TC-28: конец периода → «Финиш» + гонг один раз (второй за сессию, после стартового); после него тишина', () => {
+    const t0 = t.clock.now();
     t.timer.start(t.settings);
     t.clock.advance(5000 + 59_999);
     expect(t.timer.state).toBe('running');
     t.clock.advance(1);
     expect(t.timer.state).toBe('finished');
-    expect(t.played.filter((p) => p.id === 'finish')).toHaveLength(1);
-    expect(t.played.at(-1)!.id).toBe('finish');
+    expect(gongs(t.played).map((p) => p.at - t0)).toEqual([5000, 65_000]);
+    expect(t.played.at(-1)!.id).toBe('gong');
     expect(t.finishedLog).toHaveLength(10);
     const n = t.played.length;
     t.clock.advance(600_000);
@@ -117,7 +133,7 @@ describe('timer engine', () => {
       const shift = ev.atMs > pauseAt ? 10_000 : 0;
       expect(Math.abs(p.at - start - ev.atMs - shift)).toBeLessThanOrEqual(50);
     });
-    const fin = t.played.find((p) => p.id === 'finish')!;
+    const fin = gongs(t.played).at(-1)!;
     expect(fin.at - start).toBe(70_000);
   });
 
@@ -243,7 +259,7 @@ describe('timer engine', () => {
     clock.advance(60_000);
     await Promise.resolve();
     expect(timer.state).toBe('finished');
-    expect(errors).toHaveLength(11);
+    expect(errors).toHaveLength(12); // start gong + 10 signals + finish gong
   });
 
   it('недопустимые переходы игнорируются', () => {

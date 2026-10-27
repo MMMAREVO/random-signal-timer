@@ -42,7 +42,7 @@ function readWav(file: string): Wav {
 }
 
 describe('sound files', () => {
-  it('TC-22: 6 файлов в public/sounds, каждый — WAV 44,1 кГц, моно, 16 бит', () => {
+  it('TC-22: 7 файлов в public/sounds, каждый — WAV 44,1 кГц, моно, 16 бит', () => {
     const files = readdirSync(dir).filter((f) => f.endsWith('.wav'));
     expect(files.sort()).toEqual(SOUND_IDS.map((id) => SIGNALS[id].file).sort());
     for (const id of SOUND_IDS) {
